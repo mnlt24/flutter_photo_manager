@@ -310,11 +310,11 @@ class AssetEntity {
   ///
   /// Android: `content://media/external/video/media/894857`
   Future<String> getMediaUrl() {
-    if (type == AssetType.video || type == AssetType.audio) {
+    //if (type == AssetType.video || type == AssetType.audio) {
       return PhotoManager._getMediaUrl(this);
-    }
+    //}
 
-    return null;
+    //return null;
   }
 
   /// Orientation of android MediaStore. See [ORIENTATION](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION)
