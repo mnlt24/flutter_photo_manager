@@ -1,6 +1,12 @@
 # CHANGELOG
 
-## 0.5.1-dev.9
+## 0.5.2
+
+Support MacOS
+
+From the version, Starting from this version, 1.9 or earlier versions are not supported.
+
+## 0.5.1
 
 Feature:
 
