@@ -239,7 +239,7 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
   }
 
   Future<bool> cacheOriginBytes(bool cache) {
-    return _channel.invokeMethod("cacheOriginBytes");
+    return _channel.invokeMethod("cacheOriginBytes", {"cache": cache});
   }
 
   Future<String> getTitleAsync(AssetEntity assetEntity) async {
