@@ -860,14 +860,46 @@
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler {
   PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
   if (phAsset.isVideo) {
-    [PHCachingImageManager.defaultManager requestAVAssetForVideo:phAsset options:nil resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
-        if ([asset isKindOfClass:[AVURLAsset class]]) {
-          NSURL *url = ((AVURLAsset *) asset).URL;
-          NSLog(@"The asset asset URL = %@", url);
-          [handler reply:url.absoluteString];
-        } else {
-          [handler replyError:@"cannot get videoUrl"];
+    NSArray* resourceArray = [PHAssetResource assetResourcesForAsset: phAsset];
+    BOOL bIsLocallyAvailable = [[resourceArray.firstObject valueForKey: @"locallyAvailable"] boolValue];
+    PHVideoRequestOptions* options = nil;
+    PHImageManager* manager = PHImageManager.defaultManager;
+
+    if(!bIsLocallyAvailable) {
+      options = [[PHVideoRequestOptions alloc] init];
+      //options.version = PHVideoRequestOptionsVersionOriginal;
+      options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+      options.networkAccessAllowed = YES;
+
+      [options setProgressHandler:^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+        if (progress == 1.0) {
+          [self getMediaUrl:assetId resultHandler:handler];
         }
+      }];
+
+      manager = PHCachingImageManager.defaultManager;
+    }
+
+    [manager requestAVAssetForVideo:phAsset options:options resultHandler:^(AVAsset *asset, AVAudioMix *audioMix, NSDictionary *info) {
+      if(!bIsLocallyAvailable) {
+        BOOL downloadFinished = [PMManager isDownloadFinish:info];
+
+        if (!downloadFinished) {
+          return;
+        }
+      }
+
+      if ([handler isReplied]) {
+        return;
+      }
+
+      if ([asset isKindOfClass:[AVURLAsset class]]) {
+        NSURL *url = ((AVURLAsset *) asset).URL;
+        NSLog(@"The asset asset URL = %@", url);
+        [handler reply:url.absoluteString];
+      } else {
+        [handler replyError:@"cannot get videoUrl"];
+      }
     }];
   }
 }

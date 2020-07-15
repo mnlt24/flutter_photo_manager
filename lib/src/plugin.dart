@@ -255,11 +255,18 @@ class Plugin with BasePlugin, IosPlugin, AndroidPlugin {
     return "";
   }
 
-  Future<String> getMediaUrl(AssetEntity assetEntity) {
-    return _channel.invokeMethod("getMediaUrl", {
-      "id": assetEntity.id,
-      "type": assetEntity.typeInt,
-    });
+  Future<String> getMediaUrl(AssetEntity assetEntity) async {
+    try {
+      return await _channel.invokeMethod("getMediaUrl", {
+        "id": assetEntity.id,
+        "type": assetEntity.typeInt,
+      });
+    }
+    on PlatformException catch(e) {
+      print('PlatformException: $e');
+    }
+
+    return null;
   }
 
   Future<List<AssetPathEntity>> getSubPathEntities(
