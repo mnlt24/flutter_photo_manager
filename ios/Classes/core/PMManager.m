@@ -862,7 +862,7 @@
   NSArray* resourceArray = [PHAssetResource assetResourcesForAsset: phAsset];
   BOOL bIsLocallyAvailable = [[resourceArray.firstObject valueForKey: @"locallyAvailable"] boolValue];
 
-  [handler reply: bIsLocallyAvailable];
+  [handler reply: bIsLocallyAvailable ? @YES : @NO];
 }
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler {
