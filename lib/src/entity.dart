@@ -326,6 +326,11 @@ class AssetEntity {
     //return null;
   }
 
+  /// Support for iCloud
+  Future<bool> isLocallyAvailable() {
+    return PhotoManager._isLocallyAvailable(this);
+  }
+
   /// Orientation of android MediaStore. See [ORIENTATION](https://developer.android.com/reference/android/provider/MediaStore.MediaColumns#ORIENTATION)
   /// Example values for android: 0 90 180 270
   ///

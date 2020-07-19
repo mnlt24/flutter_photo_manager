@@ -60,6 +60,8 @@ typedef void (^AssetResult)(PMAssetEntity *);
 
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler;
 
+- (void)isLocallyAvailable:(NSString*)assetId resultHandler:(ResultHandler*)handler;
+
 - (NSArray<PMAssetPathEntity *> *)getSubPathWithId:(NSString *)id type:(int)type albumType:(int)albumType option:(PMFilterOptionGroup *)option;
 
 - (void)saveImageWithPath:(NSString *)path title:(NSString *)title desc:(NSString *)desc block:(void (^)(PMAssetEntity *))block;

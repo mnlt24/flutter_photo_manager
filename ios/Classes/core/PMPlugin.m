@@ -230,6 +230,8 @@
         [handler reply:title];
       } else if ([@"getMediaUrl" isEqualToString:call.method]) {
         [manager getMediaUrl:call.arguments[@"id"] resultHandler:handler];
+      } else if ([@"isLocallyAvailable" isEqualToString:call.method]) {
+        [manager isLocallyAvailable:call.arguments[@"id"] resultHandler:handler];
       } else if ([@"getPropertiesFromAssetEntity" isEqualToString:call.method]) {
         NSString *assetId = call.arguments[@"id"];
         PMAssetEntity *entity = [manager getAssetEntity:assetId];

@@ -245,6 +245,11 @@ class PhotoManager {
     return _plugin.getMediaUrl(assetEntity);
   }
 
+  static Future<bool> _isLocallyAvailable(AssetEntity assetEntity) {
+    assert(Platform.isIOS);
+    return _plugin.isLocallyAvailable(assetEntity);
+  }
+
   static Future<List<AssetPathEntity>> _getSubPath(
       AssetPathEntity assetPathEntity) {
     assert(Platform.isIOS || Platform.isMacOS);

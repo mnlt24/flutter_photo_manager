@@ -417,6 +417,20 @@ mixin IosPlugin on BasePlugin {
 
     return true;
   }
+
+  Future<bool> isLocallyAvailable(AssetEntity assetEntity) async {
+    try {
+      return await _channel.invokeMethod("isLocallyAvailable", {
+        "id": assetEntity.id,
+        "type": assetEntity.typeInt,
+      });
+    }
+    on PlatformException catch(e) {
+      print('PlatformException: $e');
+    }
+
+    return false;
+  }
 }
 
 mixin AndroidPlugin on BasePlugin {

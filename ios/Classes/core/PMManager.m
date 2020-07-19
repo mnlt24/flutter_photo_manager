@@ -857,6 +857,14 @@
   return @"";
 }
 
+- (void)isLocallyAvailable:(NSString*)assetId resultHandler:(ResultHandler*)handler {
+  PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
+  NSArray* resourceArray = [PHAssetResource assetResourcesForAsset: phAsset];
+  BOOL bIsLocallyAvailable = [[resourceArray.firstObject valueForKey: @"locallyAvailable"] boolValue];
+
+  [handler reply: bIsLocallyAvailable];
+}
+
 - (void)getMediaUrl:(NSString *)assetId resultHandler:(ResultHandler *)handler {
   PHAsset *phAsset = [PHAsset fetchAssetsWithLocalIdentifiers:@[assetId] options:nil].firstObject;
   if (phAsset.isVideo) {
