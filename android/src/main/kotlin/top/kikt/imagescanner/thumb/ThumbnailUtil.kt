@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.SystemClock
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
 import com.bumptech.glide.request.transition.Transition
 import io.flutter.plugin.common.MethodChannel
 import top.kikt.imagescanner.util.ResultHandler
@@ -22,32 +23,33 @@ object ThumbnailUtil {
     val resultHandler = ResultHandler(result)
 
     Glide.with(ctx)
-            .asBitmap()
-            .load(File(path))
-            .into(object : BitmapTarget(width, height) {
-              override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                super.onResourceReady(resource, transition)
-                val bos = ByteArrayOutputStream()
+      .asBitmap()
+      .load(File(path))
+      .priority(Priority.IMMEDIATE)
+      .into(object : BitmapTarget(width, height) {
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          super.onResourceReady(resource, transition)
+          val bos = ByteArrayOutputStream()
 
-                val compressFormat =
-                        if (format == 1) {
-                          Bitmap.CompressFormat.PNG
-                        } else {
-                          Bitmap.CompressFormat.JPEG
-                        }
+          val compressFormat =
+            if (format == 1) {
+              Bitmap.CompressFormat.PNG
+            } else {
+              Bitmap.CompressFormat.JPEG
+            }
 
-                resource.compress(compressFormat, quality, bos)
-                resultHandler.reply(bos.toByteArray())
-              }
+          resource.compress(compressFormat, quality, bos)
+          resultHandler.reply(bos.toByteArray())
+        }
 
-              override fun onLoadCleared(placeholder: Drawable?) {
-                resultHandler.reply(null)
-              }
+        override fun onLoadCleared(placeholder: Drawable?) {
+          resultHandler.reply(null)
+        }
 
-              override fun onLoadFailed(errorDrawable: Drawable?) {
-                resultHandler.reply(null)
-              }
-            })
+        override fun onLoadFailed(errorDrawable: Drawable?) {
+          resultHandler.reply(null)
+        }
+      })
   }
 
 
@@ -62,43 +64,50 @@ object ThumbnailUtil {
       }
 
     if(width <= 200) {
-      val bitmap = context.contentResolver.loadThumbnail(uri, Size(width, height), null)
-      val bos = ByteArrayOutputStream()
-      bitmap.compress(compressFormat, quality, bos)
-      callback(bos.toByteArray())
+      try {
+        val bitmap = context.contentResolver.loadThumbnail(uri, Size(width, height), null)
+        val bos = ByteArrayOutputStream()
+        bitmap.compress(compressFormat, quality, bos)
+        callback(bos.toByteArray())
+
+        return
+      }
+      catch(e: Exception) {
+        println(e)
+      }
     }
-    else {
-      val futureTarget = Glide.with(context)
-        .asBitmap()
-        .load(uri)
-        .submit(width, height)
 
-      val bitmap = futureTarget.get()
-      val bos = ByteArrayOutputStream()
-      bitmap.compress(compressFormat, quality, bos)
-      callback(bos.toByteArray())
+    val futureTarget = Glide.with(context)
+      .asBitmap()
+      .load(uri)
+      .priority(Priority.IMMEDIATE)
+      .submit(width, height)
 
-      Glide.with(context).clear(futureTarget);
+    val bitmap = futureTarget.get()
+    val bos = ByteArrayOutputStream()
+    bitmap.compress(compressFormat, quality, bos)
+    callback(bos.toByteArray())
 
-      /*Glide.with(context)
-        .asBitmap()
-        .load(uri)
-        .into(object : BitmapTarget(width, height) {
-          val startTime = SystemClock.uptimeMillis()
-          override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-            super.onResourceReady(resource, transition)
-            val bos = ByteArrayOutputStream()
+    Glide.with(context).clear(futureTarget);
 
-            resource.compress(compressFormat, quality, bos)
-            callback(bos.toByteArray())
-            println("elapsed: " + (SystemClock.uptimeMillis() - startTime))
-          }
+    /*Glide.with(context)
+      .asBitmap()
+      .load(uri)
+      .into(object : BitmapTarget(width, height) {
+        val startTime = SystemClock.uptimeMillis()
+        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+          super.onResourceReady(resource, transition)
+          val bos = ByteArrayOutputStream()
 
-          override fun onLoadCleared(placeholder: Drawable?) {
-            callback(null)
-          }
-        })*/
-    }
+          resource.compress(compressFormat, quality, bos)
+          callback(bos.toByteArray())
+          println("elapsed: " + (SystemClock.uptimeMillis() - startTime))
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {
+          callback(null)
+        }
+      })*/
   }
 
 
